@@ -1,10 +1,14 @@
-import { prisma } from '@/lib/prisma';
-import Image from 'next/image';
-
 export default function Home() {
   return (
-    <div>
-      <h2>Mazza</h2>
-    </div>
+    <section className="flex min-h-full">
+      <div className="flex flex-1 items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Selecione um prompt</h1>
+          <p className="text-gray-400">
+            Selecione um prompt da lista ao lado para vizualizar e editar
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -64,8 +64,8 @@ export const SidebarContent = () => {
                   variant="icon"
                   className="hidden md:inline-flex p-2 hover:bg-gray-700 focus:outline-none 
                   focus:ring-2 focus:ring-accent-500 rounded-lg transition-colors "
-                  aria-label="Close sidebar"
-                  title="Fechar menu"
+                  aria-label="Minimizar sidebar"
+                  title="Minimizar sidebar"
                 >
                   <ArrowLeftToLine className="w-5 h-5 text-gray-100" />
                 </Button>

@@ -1,9 +1,10 @@
 import { SidebarContent } from '@/components/sidebar/sidebar-content';
 import { render, screen } from '@/lib/test-utils';
 import userEvent from '@testing-library/user-event';
+const pushMock = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: pushMock,
   }),
 }));
 
@@ -51,6 +52,18 @@ describe('SidebarContent', () => {
       });
       expect(expandButton).toBeInTheDocument();
       expect(collapseButton).not.toBeInTheDocument();
+    });
+  });
+  describe('New prompt', () => {
+    it('should navigate user for page of new prompt', async () => {
+      makeSut();
+
+      const newPromptButton = screen.getByRole('button', {
+        name: 'Novo Prompt',
+      });
+      await user.click(newPromptButton);
+
+      expect(pushMock).toHaveBeenCalledWith('/new');
     });
   });
 });

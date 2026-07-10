@@ -7,7 +7,7 @@ import {
   X as CloseButton,
   Plus as AddIcon,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Logo } from '../logo';
 import { CollapsedContentSidebar } from './collapsed-content-sidebar';
 import { Input } from '../ui/input';
@@ -23,8 +23,10 @@ export type SidebarContentProps = {
 
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get('q') ?? '';
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-  const [query, setQuery] = useState<string>('');
+  const [query, setQuery] = useState<string>(initialQuery);
   const collapsedSidebar = () => setIsCollapsed(true);
   const expandedSidebar = () => setIsCollapsed(false);
   const handleNewPrompt = () => router.push('/new');

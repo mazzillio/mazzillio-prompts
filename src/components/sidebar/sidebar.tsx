@@ -3,5 +3,5 @@ import { SidebarContent } from './sidebar-content';
 
 export const Sidebar = async () => {
   const prompts = await prisma.prompt.findMany();
-  return <SidebarContent />;
+  return <SidebarContent prompts={prompts} />;
 };

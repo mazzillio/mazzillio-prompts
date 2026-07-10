@@ -1,4 +1,7 @@
-import { SidebarContent } from '@/components/sidebar/sidebar-content';
+import {
+  SidebarContent,
+  SidebarContentProps,
+} from '@/components/sidebar/sidebar-content';
 import { render, screen } from '@/lib/test-utils';
 import userEvent from '@testing-library/user-event';
 const pushMock = jest.fn();
@@ -8,19 +11,59 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
-const makeSut = () => {
-  return render(<SidebarContent />);
+const initialPrompts = [
+  {
+    id: '1',
+    title: 'Prompt 1',
+    content: 'Content 1',
+  },
+];
+
+const makeSut = (
+  { prompts = initialPrompts }: SidebarContentProps = {} as SidebarContentProps
+) => {
+  return render(<SidebarContent prompts={prompts} />);
 };
 describe('SidebarContent', () => {
   const user = userEvent.setup();
-  it('should render a new prompt button', () => {
-    makeSut();
 
-    const asideElement = screen.getByRole('complementary');
-    expect(asideElement).toBeVisible();
+  describe('base', () => {
+    it('should render prompts list', () => {
+      const input = [
+        {
+          id: '1',
+          title: 'Prompt 1',
+          content: 'Content 1',
+        },
+        {
+          id: '2',
+          title: 'Prompt 2',
+          content: 'Content 2',
+        },
+      ];
+      makeSut({ prompts: input });
+      expect(screen.getByText(input[0].title)).toBeInTheDocument();
+      expect(screen.getAllByRole('paragraph')).toHaveLength(input.length);
+    });
+    it('should render a new prompt button', () => {
+      makeSut();
 
-    const newPromptButton = screen.getByRole('button', { name: 'Novo Prompt' });
-    expect(newPromptButton).toBeVisible();
+      const asideElement = screen.getByRole('complementary');
+      expect(asideElement).toBeVisible();
+
+      const newPromptButton = screen.getByRole('button', {
+        name: 'Novo Prompt',
+      });
+      expect(newPromptButton).toBeVisible();
+    });
+
+    it('should update search input with digit', async () => {
+      makeSut();
+      const text = 'AI';
+      const searchInput = screen.getByPlaceholderText(/buscar prompts/i);
+      await user.type(searchInput, text);
+      expect(searchInput).toHaveValue(text);
+    });
   });
 
   describe('Collapse / Expand sidebar', () => {
@@ -64,6 +107,24 @@ describe('SidebarContent', () => {
       await user.click(newPromptButton);
 
       expect(pushMock).toHaveBeenCalledWith('/new');
+    });
+  });
+  describe('Search', () => {
+    it('should navigate wiht coded url when user  digit and clear', async () => {
+      makeSut();
+      const text = 'A B';
+      const searchInput = screen.getByPlaceholderText(/buscar prompts/i);
+      await user.type(searchInput, text);
+
+      expect(pushMock).toHaveBeenCalled();
+
+      const lastCall = pushMock.mock.calls.at(-1);
+      expect(lastCall?.[0]).toBe('/?q=A%20B');
+      await user.clear(searchInput);
+
+      await user.clear(searchInput);
+      const lastClearCall = pushMock.mock.calls.at(-1);
+      expect(lastClearCall?.[0]).toBe('/');
     });
   });
 });

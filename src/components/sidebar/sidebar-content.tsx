@@ -1,23 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { startTransition, useState } from 'react';
 import { Button } from '../ui/button';
 import {
   ArrowLeftToLine,
   X as CloseButton,
   Plus as AddIcon,
-  ArrowRightToLine,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Logo } from '../logo';
+import { CollapsedContentSidebar } from './collapsed-content-sidebar';
+import { Input } from '../ui/input';
 
-export const SidebarContent = () => {
+type Prompt = {
+  id: string;
+  title: string;
+  content: string;
+};
+export type SidebarContentProps = {
+  prompts: Prompt[];
+};
+
+export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const router = useRouter();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [query, setQuery] = useState<string>('');
   const collapsedSidebar = () => setIsCollapsed(true);
   const expandedSidebar = () => setIsCollapsed(false);
   const handleNewPrompt = () => router.push('/new');
-
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    startTransition(() => {
+      const url = newQuery ? `/?q=${encodeURIComponent(newQuery)}` : '/';
+      router.push(url, { scroll: false });
+    });
+  };
   return (
     <aside
       className={`border-r border-gray-700 flex flex-col h-full 
@@ -25,23 +43,7 @@ export const SidebarContent = () => {
         md:relative left-0 top-0 z-50 md:z-auto w-[80vw] sm:w-[320px] 
         ${isCollapsed ? 'md:w-[72px]' : 'md:w-[384px]'}`}
     >
-      {isCollapsed && (
-        <section className="px-2 py-6">
-          <header className="flex items-center justify-center mb-6">
-            <Button
-              variant="icon"
-              onClick={expandedSidebar}
-              className="hidden md:inline-flex p-2 hover:bg-gray-700 focus:outline-none focus:ring-2
-            focus:ring-accent-500 rounded-lg transition-colors
-            "
-              title="Expandir sidebar"
-              aria-label="Expandir sidebar"
-            >
-              <ArrowRightToLine className="w-5 h-5 text-gray-100" />
-            </Button>
-          </header>
-        </section>
-      )}
+      {isCollapsed && <CollapsedContentSidebar handleClick={expandedSidebar} />}
       {!isCollapsed && (
         <>
           <section className="p-6">
@@ -71,6 +73,18 @@ export const SidebarContent = () => {
                 </Button>
               </header>
             </div>
+            <section className="mb-5">
+              <form action="">
+                <Input
+                  name="q"
+                  type="text"
+                  value={query}
+                  placeholder="Buscar prompts..."
+                  onChange={handleQueryChange}
+                  autoFocus
+                />
+              </form>
+            </section>
             <div>
               <Button className="w-full" size="lg" onClick={handleNewPrompt}>
                 <AddIcon className="w-5 h-5 mr-2" />
@@ -80,6 +94,9 @@ export const SidebarContent = () => {
           </section>
         </>
       )}
+      {prompts.map((prompt) => (
+        <p key={prompt.id}>{prompt.title}</p>
+      ))}
     </aside>
   );
 };

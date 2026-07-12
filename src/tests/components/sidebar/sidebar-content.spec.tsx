@@ -98,6 +98,31 @@ describe('SidebarContent', () => {
       expect(expandButton).toBeInTheDocument();
       expect(collapseButton).not.toBeInTheDocument();
     });
+    it('should show new prompt button when sidebar is collapsed', async () => {
+      makeSut();
+
+      const collapseButton = screen.getByRole('button', {
+        name: /minimizar sidebar/i,
+      });
+      await user.click(collapseButton);
+
+      const newPromptButton = screen.getByRole('button', {
+        name: /novo prompt/i,
+      });
+      expect(newPromptButton).toBeVisible();
+    });
+    it('should hide prompt list when sidebar is collapsed', async () => {
+      makeSut();
+      const collapseButton = screen.getByRole('button', {
+        name: /minimizar sidebar/i,
+      });
+      await user.click(collapseButton);
+
+      const nav = screen.queryByRole('navigation', {
+        name: /lista de prompts/i,
+      });
+      expect(nav).not.toBeInTheDocument();
+    });
   });
   describe('New prompt', () => {
     it('should navigate user for page of new prompt', async () => {

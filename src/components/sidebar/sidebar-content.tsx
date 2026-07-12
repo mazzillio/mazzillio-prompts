@@ -6,19 +6,16 @@ import {
   ArrowLeftToLine,
   X as CloseButton,
   Plus as AddIcon,
+  ArrowRightToLine,
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Logo } from '../logo';
-import { CollapsedContentSidebar } from './collapsed-content-sidebar';
 import { Input } from '../ui/input';
+import { PromptSumarry } from '@/core/domain/prompts/prompt.entity';
+import { PromptList } from '../prompts/prompt-list';
 
-type Prompt = {
-  id: string;
-  title: string;
-  content: string;
-};
 export type SidebarContentProps = {
-  prompts: Prompt[];
+  prompts: PromptSumarry[];
 };
 
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
@@ -45,7 +42,32 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
         md:relative left-0 top-0 z-50 md:z-auto w-[80vw] sm:w-[320px] 
         ${isCollapsed ? 'md:w-[72px]' : 'md:w-[384px]'}`}
     >
-      {isCollapsed && <CollapsedContentSidebar handleClick={expandedSidebar} />}
+      {isCollapsed && (
+        <section className="px-2 py-6">
+          <header className="flex items-center justify-center mb-6">
+            <Button
+              variant="icon"
+              onClick={expandedSidebar}
+              className="hidden md:inline-flex p-2 hover:bg-gray-700 focus:outline-none focus:ring-2
+               focus:ring-accent-500 rounded-lg transition-colors
+               "
+              title="Expandir sidebar"
+              aria-label="Expandir sidebar"
+            >
+              <ArrowRightToLine className="w-5 h-5 text-gray-100" />
+            </Button>
+          </header>
+          <div className="flex flex-col items-center space-y-4">
+            <Button
+              onClick={handleNewPrompt}
+              title="Novo prompt"
+              aria-label="Novo prompt"
+            >
+              <AddIcon className="w-5 h-5 text-white" />
+            </Button>
+          </div>
+        </section>
+      )}
       {!isCollapsed && (
         <>
           <section className="p-6">
@@ -94,11 +116,14 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
               </Button>
             </div>
           </section>
+          <nav
+            className="flex-1 overflow-auto px-6 pb-6"
+            aria-label="Lista de prompts"
+          >
+            <PromptList prompts={prompts} />
+          </nav>
         </>
       )}
-      {prompts.map((prompt) => (
-        <p key={prompt.id}>{prompt.title}</p>
-      ))}
     </aside>
   );
 };
